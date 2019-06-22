@@ -1,6 +1,6 @@
 {
   "name": "dingtalk-encrypt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "dingTalk Encrypt Node Version, from third partner.",
   "main": "index.js",
   "scripts": {
