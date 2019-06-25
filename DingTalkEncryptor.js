@@ -16,11 +16,11 @@ class DingTalkEncryptor {
 
     this.token = token;
     this.encodingAesKey = encodingAesKey;
-    this.aesKey = (new Buffer.from(encodingAesKey + '=', 'base64')).toString();
+    this.aesKey = (new Buffer.from(encodingAesKey + '=', 'base64')).toString('hex');
     this.corpId = corpIdOrSuiteKey;
 
-    this.keySpec = CryptoJS.enc.Latin1.parse(this.aesKey);
-    this.iv = CryptoJS.enc.Latin1.parse(this.aesKey.substr(0, 16));
+    this.keySpec = CryptoJS.enc.Hex.parse(this.aesKey);
+    this.iv = CryptoJS.enc.Hex.parse(this.aesKey.substr(0, 32));
     this.options = {
       iv: this.iv,
       mode: CryptoJS.mode.CBC,
@@ -49,6 +49,7 @@ class DingTalkEncryptor {
       // unencrypted = CryptoJS.enc.Utf8.parse(unencrypted)
       const encrypted = CryptoJS.AES.encrypt(unencrypted, this.keySpec, this.options);
       return encrypted.toString();
+      // return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
     } catch (error) {
       throw new DingTalkEncryptException(900007);
     }
