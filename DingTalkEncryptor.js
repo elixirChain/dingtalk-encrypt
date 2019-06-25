@@ -112,12 +112,12 @@ class DingTalkEncryptor {
     } else {
       const encrypt = this.encrypt(Utils.getRandomStr(this.RANDOM_LENGTH), plaintext);
       const signature = this.getSignature(this.token, timeStamp, nonce, encrypt);
-      const resultMap = new Map();
-      resultMap.set('msg_signature', signature);
-      resultMap.set('encrypt', encrypt);
-      resultMap.set('timeStamp', timeStamp);
-      resultMap.set('nonce', nonce);
-      return resultMap;
+      return {
+        msg_signature: signature,
+        encrypt: encrypt,
+        timeStamp: timeStamp,
+        nonce: nonce
+      };
     }
   }
 
