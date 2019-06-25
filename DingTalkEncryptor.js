@@ -16,15 +16,21 @@ class DingTalkEncryptor {
 
     this.token = token;
     this.encodingAesKey = encodingAesKey;
-    this.aesKey = new Buffer.from(encodingAesKey + '=', 'base64');
+    this.aesKey = (new Buffer.from(encodingAesKey + '=', 'base64')).toString();
     this.corpId = corpIdOrSuiteKey;
+
+    this.keySpec = CryptoJS.enc.Latin1.parse(this.aesKey);
+    this.iv = CryptoJS.enc.Latin1.parse(this.aesKey.substr(0, 16));
+    this.options = {
+      iv: this.iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.NoPadding,
+    };
   }
 
   // verify encodingAesKey
   set encodingAesKey(val){
-    if (val && val.length === this.AES_ENCODE_KEY_LENGTH) {
-      this.aesKey = new Buffer.from(val + '=', 'base64');
-    } else {
+    if (!val || val.length !== this.AES_ENCODE_KEY_LENGTH) {
       throw new DingTalkEncryptException(900004);
     }
   }
@@ -39,43 +45,23 @@ class DingTalkEncryptor {
       unencrypted += this.corpId;
       unencrypted += PKCS7Padding.getPaddingBytes(unencrypted.length);
 
-      const key = CryptoJS.enc.Latin1.parse(this.aesKey.toString());
-      const iv = CryptoJS.enc.Latin1.parse(this.aesKey.toString().substr(0, 16));
-      /** NoPadding,ZeroPadding,Pkcs7 ... */
-      const pad = CryptoJS.pad.NoPadding;
       // encrypt
-      const encrypted = CryptoJS.AES.encrypt(
-        unencrypted,
-        key,
-        {
-          iv,
-          mode: CryptoJS.mode.CBC,
-          padding: pad,
-        }
-      );
-      return encrypted;
+      // unencrypted = CryptoJS.enc.Utf8.parse(unencrypted)
+      const encrypted = CryptoJS.AES.encrypt(unencrypted, this.keySpec, this.options);
+      return encrypted.toString();
     } catch (error) {
       throw new DingTalkEncryptException(900007);
     }
   }
 
-  decrypt(text) {
+  decrypt(encrypted) {
     let originalStr;
     let networkOrder;
     try {
-      const key = CryptoJS.enc.Latin1.parse(this.aesKey.toString());
-      const iv = CryptoJS.enc.Latin1.parse(this.aesKey.toString().substr(0, 16));
-      /** NoPadding,ZeroPadding,Pkcs7 ... */
-      const pad = CryptoJS.pad.NoPadding;
       // decrypt
-      const decrypted = CryptoJS.AES.decrypt(text,
-        key,
-        {
-          iv,
-          padding: pad,
-        }
-      );
-      originalStr = decrypted.toString(CryptoJS.enc.Utf8);
+      const decrypted = CryptoJS.AES.decrypt(encrypted, this.keySpec, this.options);
+      // originalStr = decrypted.toString(CryptoJS.enc.Utf8);
+      originalStr = CryptoJS.enc.Utf8.stringify(decrypted);
     } catch (error) {
       throw new DingTalkEncryptException(900008);
     }

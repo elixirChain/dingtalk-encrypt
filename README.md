@@ -16,7 +16,7 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
 
 # API Doc
 - Need constants:
-> TOKEN - Random str for signature, unrestricted, such as "123456".  
+> TOKEN - Random string for signature, unrestricted, such as "123456".  
   ENCODING_AES_KEY - Secret key for callback data, random 43 characters of [a-z, A-Z, 0-9].  
   CORP_ID - DingTalk corpId from the [Official OA](https://oa.dingtalk.com).  
 
