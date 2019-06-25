@@ -2,6 +2,7 @@
 
 const int2Bytes = function(count) {
   const byteArr = [ (count >> 24 & 255), (count >> 16 & 255), (count >> 8 & 255), (count & 255) ];
+  // console.log(`debug int2Bytes: ${count} -> ${byteArr}`);
   return byteArr;
 };
 const bytes2int = function(byteArr) {
@@ -10,19 +11,23 @@ const bytes2int = function(byteArr) {
     count <<= 8;
     count |= byteArr[i] & 255;
   }
+  // console.log(`debug bytes2int: ${byteArr} -> ${count}`);
   return count;
 };
 
 // https://stackoverflow.com/questions/3195865/converting-byte-array-to-string-in-javascript
 const string2Bin = function(str) {
-  const result = [];
+  const binaryArr = [];
   for (let i = 0; i < str.length; i++) {
-    result.push(str.charCodeAt(i));
+    binaryArr.push(str.charCodeAt(i));
   }
-  return result;
+  // console.log(`debug string2Bin: ${str} -> ${binaryArr}`);
+  return binaryArr;
 };
 const bin2String = function(array) {
-  return String.fromCharCode.apply(String, array);
+  const str = String.fromCharCode.apply(String, array);
+  // console.log(`debug bin2String: ${array} -> ${str}`);
+  return str;
 };
 
 const getRandomStr = function(size) {

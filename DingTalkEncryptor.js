@@ -16,11 +16,12 @@ class DingTalkEncryptor {
 
     this.token = token;
     this.encodingAesKey = encodingAesKey;
-    this.aesKey = (new Buffer.from(encodingAesKey + '=', 'base64')).toString('hex');
+    // decode encodingAesKey to aesKey, then convert to binary
+    this.aesKey = (new Buffer.from(encodingAesKey + '=', 'base64')).toString('binary');
     this.corpId = corpIdOrSuiteKey;
 
-    this.keySpec = CryptoJS.enc.Hex.parse(this.aesKey);
-    this.iv = CryptoJS.enc.Hex.parse(this.aesKey.substr(0, 32));
+    this.keySpec = CryptoJS.enc.Latin1.parse(this.aesKey);
+    this.iv = CryptoJS.enc.Latin1.parse(this.aesKey.substr(0, 16));
     this.options = {
       iv: this.iv,
       mode: CryptoJS.mode.CBC,
@@ -46,11 +47,11 @@ class DingTalkEncryptor {
       unencrypted += PKCS7Padding.getPaddingBytes(unencrypted.length);
 
       // encrypt
-      // unencrypted = CryptoJS.enc.Utf8.parse(unencrypted)
+      unencrypted = CryptoJS.enc.Latin1.parse(unencrypted)
       const encrypted = CryptoJS.AES.encrypt(unencrypted, this.keySpec, this.options);
       return encrypted.toString();
       // return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
-    } catch (error) {
+    } catch (e) {
       throw new DingTalkEncryptException(900007);
     }
   }
@@ -61,9 +62,9 @@ class DingTalkEncryptor {
     try {
       // decrypt
       const decrypted = CryptoJS.AES.decrypt(encrypted, this.keySpec, this.options);
-      // originalStr = decrypted.toString(CryptoJS.enc.Utf8);
-      originalStr = CryptoJS.enc.Utf8.stringify(decrypted);
-    } catch (error) {
+      originalStr = CryptoJS.enc.Latin1.stringify(decrypted);
+    } catch (e) {
+      console.log(e);
       throw new DingTalkEncryptException(900008);
     }
 
@@ -77,7 +78,11 @@ class DingTalkEncryptor {
       const plainTextLength = Utils.bytes2int(Utils.string2Bin(networkOrder));
       plainText = noPadRet.substring(20, 20 + plainTextLength);
       fromCorpid = noPadRet.substring(20 + plainTextLength, noPadRet.length);
-    } catch (error) {
+      // console.log(`debug noPadRet: ${noPadRet.length}: ${noPadRet}`);
+      // console.log(`debug networkOrder: ${networkOrder.length}: [${networkOrder}]`);
+      // console.log(`debug plainText: ${plainText.length}: ${plainText}`);
+      // console.log(`debug fromCorpid: ${fromCorpid.length}: ${fromCorpid}`);
+    } catch (e) {
       throw new DingTalkEncryptException(900009);
     }
 
