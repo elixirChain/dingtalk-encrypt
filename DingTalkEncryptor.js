@@ -16,10 +16,13 @@ class DingTalkEncryptor {
 
     this.token = token;
     this.encodingAesKey = encodingAesKey;
+    // this.aesKey = (new Buffer.from(encodingAesKey + '=', 'base64')).toString('hex');
     // decode encodingAesKey to aesKey, then convert to binary
     this.aesKey = (new Buffer.from(encodingAesKey + '=', 'base64')).toString('binary');
     this.corpId = corpIdOrSuiteKey;
 
+    // this.keySpec = CryptoJS.enc.Hex.parse(this.aesKey);
+    // this.iv = CryptoJS.enc.Hex.parse(this.aesKey.substr(0, 32));
     this.keySpec = CryptoJS.enc.Latin1.parse(this.aesKey);
     this.iv = CryptoJS.enc.Latin1.parse(this.aesKey.substr(0, 16));
     this.options = {
@@ -47,7 +50,8 @@ class DingTalkEncryptor {
       unencrypted += PKCS7Padding.getPaddingBytes(unencrypted.length);
 
       // encrypt
-      unencrypted = CryptoJS.enc.Latin1.parse(unencrypted)
+      // unencrypted = CryptoJS.enc.Latin1.parse(unencrypted) // 中文乱码
+      unencrypted = CryptoJS.enc.Utf16.parse(unencrypted)
       const encrypted = CryptoJS.AES.encrypt(unencrypted, this.keySpec, this.options);
       return encrypted.toString();
       // return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
@@ -62,7 +66,8 @@ class DingTalkEncryptor {
     try {
       // decrypt
       const decrypted = CryptoJS.AES.decrypt(encrypted, this.keySpec, this.options);
-      originalStr = CryptoJS.enc.Latin1.stringify(decrypted);
+      // originalStr = CryptoJS.enc.Latin1.stringify(decrypted); // 中文乱码
+      originalStr = CryptoJS.enc.Utf16.stringify(decrypted);
     } catch (e) {
       console.log(e);
       throw new DingTalkEncryptException(900008);

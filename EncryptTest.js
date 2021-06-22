@@ -24,17 +24,19 @@ const timeStamp = '1561081681688';
 const nonce = '88888888';
 
 /** 测试加解密响应报文或者字符串 */
-const testJson = {
-  EventType: 'bpms_instance_change',
-  processInstanceId: 'ad253df6-e175caf-68085c60ba8a',
-  corpId: 'ding2c4d8175651',
-  createTime: 1495592259000,
-  title: '自测-1016',
-  type: 'start',
-  staffId: 'er5875',
-  url: 'https://aflow.dingtalk.com/dingtalk/mobile/homepage.htm',
-  processCode: 'xxx',
-};
+// const testJson = {
+//   EventType: 'bpms_instance_change',
+//   processInstanceId: 'ad253df6-e175caf-68085c60ba8a',
+//   corpId: 'ding2c4d8175651',
+//   createTime: 1495592259000,
+//   title: '自测-1016',
+//   type: 'start',
+//   staffId: 'er5875',
+//   url: 'https://aflow.dingtalk.com/dingtalk/mobile/homepage.htm',
+//   processCode: 'xxx',
+// };
+const testJson = '中文乱码测试/abc/123';
+
 // console.log(JSON.parse(JSON.stringify(testJson)));
 // const unencryptedJson = 'success';
 const unencryptedJson = JSON.stringify(testJson);
