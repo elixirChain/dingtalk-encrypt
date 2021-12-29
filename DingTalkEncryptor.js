@@ -1,10 +1,7 @@
 /* eslint-disable no-bitwise */
 'use strict';
 
-const CryptoJS = require('crypto-js');
-// const AES = require('crypto-js/aes');
-const PKCS7Padding = require('./PKCS7Padding');
-const Utils = require('./Utils');
+const Crypto = require('crypto');
 const DingTalkEncryptException = require('./DingTalkEncryptException');
 
 class DingTalkEncryptor {
@@ -16,24 +13,14 @@ class DingTalkEncryptor {
 
     this.token = token;
     this.encodingAesKey = encodingAesKey;
-    // this.aesKey = (new Buffer.from(encodingAesKey + '=', 'base64')).toString('hex');
-    // decode encodingAesKey to aesKey, then convert to binary
-    this.aesKey = (new Buffer.from(encodingAesKey + '=', 'base64')).toString('binary');
+    this.aesKey = (Buffer.from(encodingAesKey + '=', 'base64')).toString();
     this.corpId = corpIdOrSuiteKey;
-
-    // this.keySpec = CryptoJS.enc.Hex.parse(this.aesKey);
-    // this.iv = CryptoJS.enc.Hex.parse(this.aesKey.substr(0, 32));
-    this.keySpec = CryptoJS.enc.Latin1.parse(this.aesKey);
-    this.iv = CryptoJS.enc.Latin1.parse(this.aesKey.substr(0, 16));
-    this.options = {
-      iv: this.iv,
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.NoPadding,
-    };
+    this.keySpec = this.aesKey;
+    this.iv = this.aesKey.slice(0, 16);
   }
 
   // verify encodingAesKey
-  set encodingAesKey(val){
+  set encodingAesKey(val) {
     if (!val || val.length !== this.AES_ENCODE_KEY_LENGTH) {
       throw new DingTalkEncryptException(900004);
     }
@@ -41,57 +28,46 @@ class DingTalkEncryptor {
 
   encrypt(random, plainText) {
     try {
-      // 拼接字符串
-      let unencrypted = random;
-      // unencrypted += plainText.length; // 先获取byte数组，再转换为字符串
-      unencrypted += Utils.bin2String(Utils.int2Bytes(plainText.length));
-      unencrypted += plainText;
-      unencrypted += this.corpId;
-      unencrypted += PKCS7Padding.getPaddingBytes(unencrypted.length);
-
-      // encrypt
-      // unencrypted = CryptoJS.enc.Latin1.parse(unencrypted) // 中文乱码
-      unencrypted = CryptoJS.enc.Utf16.parse(unencrypted)
-      const encrypted = CryptoJS.AES.encrypt(unencrypted, this.keySpec, this.options);
-      return encrypted.toString();
-      // return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+      const randomBuf = Buffer.from(random);
+      const plainTextBuf = Buffer.from(plainText);
+      const textLen = plainTextBuf.length;
+      const textLenBuf = Buffer.from([(textLen >> 24 & 255), (textLen >> 16 & 255), (textLen >> 8 & 255), (textLen & 255)]);
+      const cropIdBuf = Buffer.from(this.corpId);
+      const padCount = 32 - (randomBuf.length + textLenBuf.length + plainTextBuf.length + cropIdBuf.length) % 32;
+      const padBuf = Buffer.from(new Array(padCount).fill(padCount));
+      const finalBuf = Buffer.concat([randomBuf, textLenBuf, plainTextBuf, cropIdBuf, padBuf]);
+      const crypto = Crypto.createCipheriv('AES-256-CBC', this.keySpec, this.iv);
+      return Buffer.concat([crypto.update(finalBuf), crypto.final()]).toString('base64');
     } catch (e) {
       throw new DingTalkEncryptException(900007);
     }
   }
 
   decrypt(encrypted) {
-    let originalStr;
-    let networkOrder;
+    let decrypt;
     try {
       // decrypt
-      const decrypted = CryptoJS.AES.decrypt(encrypted, this.keySpec, this.options);
-      // originalStr = CryptoJS.enc.Latin1.stringify(decrypted); // 中文乱码
-      originalStr = CryptoJS.enc.Utf16.stringify(decrypted);
+      const crypto = Crypto.createDecipheriv('AES-256-CBC', this.keySpec, this.iv);
+      decrypt = Buffer.concat([crypto.update(encrypted, 'base64'), crypto.final()]);
     } catch (e) {
-      console.log(e);
       throw new DingTalkEncryptException(900008);
     }
 
+    let cropId;
     let plainText;
-    let fromCorpid;
-    let noPadRet;
     try {
-      noPadRet = PKCS7Padding.removePaddingBytes(originalStr);
-      networkOrder = noPadRet.substring(16, 20);
-      // reverse: Utils.bin2String(Utils.int2Bytes(plainText.length));
-      const plainTextLength = Utils.bytes2int(Utils.string2Bin(networkOrder));
-      plainText = noPadRet.substring(20, 20 + plainTextLength);
-      fromCorpid = noPadRet.substring(20 + plainTextLength, noPadRet.length);
-      // console.log(`debug noPadRet: ${noPadRet.length}: ${noPadRet}`);
-      // console.log(`debug networkOrder: ${networkOrder.length}: [${networkOrder}]`);
-      // console.log(`debug plainText: ${plainText.length}: ${plainText}`);
-      // console.log(`debug fromCorpid: ${fromCorpid.length}: ${fromCorpid}`);
+      let pad = decrypt[decrypt.length - 1];
+      if (pad < 1 || pad > 32) pad = 0;
+      const finalDecrypt = decrypt.slice(0, decrypt.length - pad);
+      // const random = finalDecrypt.slice(0, 16);
+      const textLen = finalDecrypt.slice(16, 20).readUInt32BE();
+      plainText = finalDecrypt.slice(20, 20 + textLen).toString();
+      cropId = finalDecrypt.slice(20 + textLen).toString();
     } catch (e) {
       throw new DingTalkEncryptException(900009);
     }
 
-    if (fromCorpid !== this.corpId) {
+    if (cropId !== this.corpId) {
       throw new DingTalkEncryptException(900010);
     } else {
       return plainText;
@@ -99,11 +75,12 @@ class DingTalkEncryptor {
   }
 
   getSignature(token, timestamp, nonce, encrypt) {
-    timestamp = timestamp+'';
-    const strArr = [ this.token, timestamp, nonce, encrypt ];
+    timestamp = timestamp + '';
+    const strArr = [this.token, timestamp, nonce, encrypt];
     strArr.sort();
-    const sha1Arr = CryptoJS.SHA1(strArr.join(''));
-    return sha1Arr.toString();
+    const sha1 = Crypto.createHash('sha1');
+    sha1.update(strArr.join(''))
+    return sha1.digest('hex');
   }
 
   getEncryptedMap(plaintext, timeStamp, nonce) {
@@ -115,7 +92,7 @@ class DingTalkEncryptor {
     } else if (nonce == null) {
       throw new DingTalkEncryptException(900003);
     } else {
-      const encrypt = this.encrypt(Utils.getRandomStr(this.RANDOM_LENGTH), plaintext);
+      const encrypt = this.encrypt(this.getRandomStr(this.RANDOM_LENGTH), plaintext);
       const signature = this.getSignature(this.token, timeStamp, nonce, encrypt);
       return {
         msg_signature: signature,
@@ -135,6 +112,14 @@ class DingTalkEncryptor {
     }
   }
 
+  getRandomStr(size) {
+    const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomStr = '';
+    for (let i = size; i > 0; --i) {
+      randomStr += base[Math.floor(Math.random() * base.length)];
+    }
+    return randomStr;
+  };
 }
 
 module.exports = DingTalkEncryptor;

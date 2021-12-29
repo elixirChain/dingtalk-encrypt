@@ -76,6 +76,7 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
   const decryptedJson = encryptor.decrypt(encryptedJson);
   console.log(`  \nnode decryptedJson:\n ${decryptedJson}, (${decryptedJson.length})`);
   console.log('  \nnode sign:\n ' + encryptor.getSignature(TOKEN, timeStamp, nonce, encryptedJson));
+
   ```
 
 # Thanks To
