@@ -30,6 +30,11 @@ const bin2String = function(array) {
   return str;
 };
 
+/**
+ * get random string
+ * @param {number} size 
+ * @return {string} random string
+ */
 const getRandomStr = function(size) {
   const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let randomStr = '';
@@ -39,10 +44,17 @@ const getRandomStr = function(size) {
   return randomStr;
 };
 
+/**
+ * random encoding aes key
+ * @return {string} EncodingAesKey
+ */
+const getRandomEncodingAesKey = () => Buffer.from(getRandomStr(32)).toString('base64').substring(0, 43);
+
 module.exports = {
   int2Bytes,
   bytes2int,
   string2Bin,
   bin2String,
   getRandomStr,
+  getRandomEncodingAesKey,
 };

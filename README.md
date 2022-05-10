@@ -35,11 +35,11 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
   const utils = require('dingtalk-encrypt/Utils');
   /** 加解密需要，可以随机填写。如 "12345" */
   const TOKEN = '666666';
-  /** 加密密钥，用于回调数据的加密，固定为43个字符，从[a-z, A-Z, 0-9]共62个字符中随机生成*/
-  const ENCODING_AES_KEY = 'TXpRMU5qYzRPVEF4TWpNME5UWTNPRGt3TVRJek5EVTI';
+  /** 加密密钥，用于回调数据的加密，固定为43个字符，从[a-z, A-Z, 0-9]共62个字符中随机生成, 见 getRandomEncodingAesKey */
+  const ENCODING_AES_KEY = utils.getRandomEncodingAesKey();
   // const ENCODING_AES_KEY = utils.getRandomStr(43);
   /** 企业corpid, 可以在钉钉企业管理后台查看（https://oa.dingtalk.com/） */
-  const CORP_ID = 'ding12345678901234567890123456789012';
+  const CORP_ID = 'ding1234567890';
   /** 实例化加密类 */
   console.log('\nEncryptor Test:');
   const encryptor = new DingTalkEncryptor(TOKEN, ENCODING_AES_KEY, CORP_ID);
