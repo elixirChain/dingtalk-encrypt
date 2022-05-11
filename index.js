@@ -8,3 +8,9 @@
 }(this, function(DingTalkEncryptor) {
   return DingTalkEncryptor;
 }));
+
+// 兼容
+exports.DingTalkEncryptor = require("./DingTalkEncryptor")
+const Utils = require("./Utils");
+exports.getRandomEncodingAesKey = Utils.getRandomEncodingAesKey;
+exports.getRandomStr = Utils.getRandomStr;

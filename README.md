@@ -31,13 +31,15 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
   - 处理钉钉回调
   ```
   // 参考：钉钉开发文档-业务事件回调 
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const DingTalkEncryptor = require('dingtalk-encrypt');
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const utils = require('dingtalk-encrypt/Utils');
   /** 加解密需要，可以随机填写。如 "12345" */
-  const TOKEN = '666666';
+  const TOKEN = utils.getRandomStr(6);
   /** 加密密钥，用于回调数据的加密，固定为43个字符，从[a-z, A-Z, 0-9]共62个字符中随机生成, 见 getRandomEncodingAesKey */
   const ENCODING_AES_KEY = utils.getRandomEncodingAesKey();
-  // const ENCODING_AES_KEY = utils.getRandomStr(43);
+  console.log('ENCODING_AES_KEY: \n', ENCODING_AES_KEY);
   /** 企业corpid, 可以在钉钉企业管理后台查看（https://oa.dingtalk.com/） */
   const CORP_ID = 'ding1234567890';
   /** 实例化加密类 */

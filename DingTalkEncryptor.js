@@ -2,6 +2,7 @@
 'use strict';
 
 const Crypto = require('crypto');
+const Utils = require('./Utils');
 const DingTalkEncryptException = require('./DingTalkEncryptException');
 
 class DingTalkEncryptor {
@@ -109,7 +110,7 @@ class DingTalkEncryptor {
     } else if (nonce == null) {
       throw new DingTalkEncryptException(900003);
     } else {
-      const encrypt = this.encrypt(this.getRandomStr(this.RANDOM_LENGTH), plaintext);
+      const encrypt = this.encrypt(Utils.getRandomStr(this.RANDOM_LENGTH), plaintext);
       const signature = this.getSignature(this.token, timestamp, nonce, encrypt);
       return {
         msg_signature: signature,
@@ -133,17 +134,6 @@ class DingTalkEncryptor {
     }
   }
 
-  /**
-   * 获取随机串
-   */
-  getRandomStr(size) {
-    const base = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const randomStr = '';
-    for (const i = size; i > 0; --i) {
-      randomStr += base[Math.floor(Math.random() * base.length)];
-    }
-    return randomStr;
-  };
 }
 
 module.exports = DingTalkEncryptor;
