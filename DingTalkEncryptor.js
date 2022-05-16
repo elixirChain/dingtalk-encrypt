@@ -66,7 +66,7 @@ class DingTalkEncryptor {
     try {
       const textLen = decrypt.slice(16, 20).readUInt32BE();
       plainText = decrypt.slice(20, 20 + textLen).toString();
-      const pad = decrypt.length - 16 - 4 - textLen - 20;
+      let pad = decrypt.length - 16 - 4 - textLen - 20;
       if (pad > 31) pad = 0;
       const finalDecrypt = decrypt.slice(0, decrypt.length - pad);
       corpId = finalDecrypt.slice(20 + textLen).toString();

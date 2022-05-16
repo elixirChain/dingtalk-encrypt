@@ -1,7 +1,7 @@
 {
   "name": "dingtalk-encrypt",
-  "version": "2.1.0",
-  "description": "DingTalk Encrypt Nodejs Version.",
+  "version": "2.1.1",
+  "description": "Nodejs Version Message Encryption & Decryption of DingTalk.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

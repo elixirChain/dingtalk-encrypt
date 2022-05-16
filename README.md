@@ -1,5 +1,5 @@
 # dingtalk-encrypt
-DingTalk Encrypt Node Version.  
+Nodejs Version Message Encryption & Decryption of DingTalk..  
 Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git): 
 
 **Issues:** It's your turn!
@@ -8,7 +8,7 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
 ## this repository
 - git clone
 - npm install
-- run 'EncryptTest.js' for main APIs.
+- run 'EncryptTest.js' for main APIs and Utils.
 
 ## npm module
 - npm install --save dingtalk-encrypt
@@ -26,6 +26,9 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
   - getSignature
   - encrypt
   - decrypt
+- Utils [dingtalk-encrypt/Utils]:
+  - getRandomStr
+  - getRandomEncodingAesKey
 
 - Example
   - 处理钉钉回调
@@ -82,5 +85,4 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
   ```
 
 # Thanks To
-- [Authors of crypto-js](https://github.com/brix/crypto-js)
 - [Authors of eapp-corp-project](https://github.com/opendingtalk/eapp-corp-project)

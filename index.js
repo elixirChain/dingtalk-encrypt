@@ -10,7 +10,11 @@
 }));
 
 // 兼容
-exports.DingTalkEncryptor = require("./DingTalkEncryptor")
+exports.DingTalkEncryptor = require("./DingTalkEncryptor");
+// 导出异常
+exports.DingTalkEncryptException = require('./DingTalkEncryptException');
+
+// 导出工具函数
 const Utils = require("./Utils");
 exports.getRandomEncodingAesKey = Utils.getRandomEncodingAesKey;
 exports.getRandomStr = Utils.getRandomStr;
