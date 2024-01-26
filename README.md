@@ -18,7 +18,7 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
 - Need constants:
 > TOKEN - Random string for signature, unrestricted, such as "123456".  
   ENCODING_AES_KEY - Secret key for callback data, random 43 characters of [a-z, A-Z, 0-9].  
-  KEY - DingTalk suiteKey or customKey or Corpid from the [Official](https://open.dingtalk.com/document/orgapp/callback-event-message-body-encryption-and-decryption#title-082-lby-s08).  
+  KEY - DingTalk suiteKey or customKey or Corpid, see [Official](https://open.dingtalk.com/document/orgapp/callback-event-message-body-encryption-and-decryption#title-082-lby-s08).  
 
 - Main APIs([Usage Example](https://open-doc.dingtalk.com/microapp/serverapi2/lo5n6i)):
   - getEncryptedMap
