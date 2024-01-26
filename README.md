@@ -18,7 +18,7 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
 - Need constants:
 > TOKEN - Random string for signature, unrestricted, such as "123456".  
   ENCODING_AES_KEY - Secret key for callback data, random 43 characters of [a-z, A-Z, 0-9].  
-  CORP_ID - DingTalk corpId from the [Official OA](https://oa.dingtalk.com).  
+  KEY - DingTalk suiteKey or customKey or key from the [Official](https://open.dingtalk.com/document/orgapp/callback-event-message-body-encryption-and-decryption#title-082-lby-s08).  
 
 - Main APIs([Usage Example](https://open-doc.dingtalk.com/microapp/serverapi2/lo5n6i)):
   - getEncryptedMap
@@ -43,11 +43,11 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
   /** 加密密钥，用于回调数据的加密，固定为43个字符，从[a-z, A-Z, 0-9]共62个字符中随机生成, 见 getRandomEncodingAesKey */
   const ENCODING_AES_KEY = utils.getRandomEncodingAesKey();
   console.log('ENCODING_AES_KEY: \n', ENCODING_AES_KEY);
-  /** 企业corpid, 可以在钉钉企业管理后台查看（https://oa.dingtalk.com/） */
-  const CORP_ID = 'ding1234567890';
+  /** key 第三方企业应用为suiteKey, 企业定制应用为customKey, 企业内部应用为Corpid, 可以在钉钉企业管理后台查看（https://oa.dingtalk.com/） */
+  const KEY = 'ding1234567890';
   /** 实例化加密类 */
   console.log('\nEncryptor Test:');
-  const encryptor = new DingTalkEncryptor(TOKEN, ENCODING_AES_KEY, CORP_ID);
+  const encryptor = new DingTalkEncryptor(TOKEN, ENCODING_AES_KEY, KEY);
 
   // 解密钉钉回调数据 
   const plainText = encryptor.getDecryptMsg(signature, timestamp, nonce, encryptMsg);
@@ -64,7 +64,7 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
   const testJson = {
     EventType: 'bpms_instance_change',
     processInstanceId: 'ad253df6-e175caf-68085c60ba8a',
-    corpId: 'ding2c4d8175651',
+    key: 'ding2c4d8175651',
     createTime: 1495592259000,
     title: '自测-1016',
     type: 'start',
