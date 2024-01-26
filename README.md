@@ -20,7 +20,7 @@ Refer to [Java version](https://github.com/opendingtalk/eapp-corp-project.git):
   ENCODING_AES_KEY - Secret key for callback data, random 43 characters of [a-z, A-Z, 0-9].  
   KEY - DingTalk suiteKey or customKey or Corpid, see [Official](https://open.dingtalk.com/document/orgapp/callback-event-message-body-encryption-and-decryption#title-082-lby-s08).  
 
-- Main APIs([Usage Example](https://open-doc.dingtalk.com/microapp/serverapi2/lo5n6i)):
+- Main APIs([Usage Example](https://open.dingtalk.com/document/orgapp/callback-event-message-body-encryption-and-decryption#title-5q6-33l-ant)):
   - getEncryptedMap
   - getDecryptMsg
   - getSignature
