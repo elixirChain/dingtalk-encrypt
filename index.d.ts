@@ -42,7 +42,12 @@ declare module 'dingtalk-encrypt' {
      * @param timeStamp 
      * @param nonce 
      */
-    getEncryptedMap(plaintext: string, timeStamp: string, nonce: string): string;
+    getEncryptedMap(plaintext: string, timeStamp: string, nonce: string): {
+      msg_signature: string;
+      encrypt: string;
+      timeStamp: string;
+      nonce: string;
+    };
   
     /**
      * 解密回调数据
@@ -56,6 +61,16 @@ declare module 'dingtalk-encrypt' {
   }
 
   /**
+   * 加解密异常
+   */
+  export class DingTalkEncryptException {
+    code: number;
+    message: string;
+    constructor(code: number);
+    toString(): string;
+  }
+
+  /**
    * Utils
    */
 
@@ -64,7 +79,7 @@ declare module 'dingtalk-encrypt' {
    * @param {number} size 
    * @return {string} random string of length {size} 
    */
-  export const getRandomStr: (size) => string;
+  export const getRandomStr: (size: number) => string;
 
   /**
    * random aes key of encoding with base64
