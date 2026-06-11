@@ -25,6 +25,11 @@ class DingTalkEncryptor {
     if (!val || val.length !== this.AES_ENCODE_KEY_LENGTH) {
       throw new DingTalkEncryptException(900004);
     }
+    this._encodingAesKey = val;
+  }
+
+  get encodingAesKey() {
+    return this._encodingAesKey;
   }
 
   /**
@@ -42,7 +47,7 @@ class DingTalkEncryptor {
       const finalBuf = Buffer.concat([randomBuf, textLenBuf, plainTextBuf, corpIdBuf, padBuf]);
       const crypto = Crypto.createCipheriv('AES-256-CBC', this.aesKey, this.iv);
       crypto.setAutoPadding(false);
-      return Buffer.concat([crypto.update(finalBuf)]).toString('base64');
+      return Buffer.concat([crypto.update(finalBuf), crypto.final()]).toString('base64');
     } catch (e) {
       throw new DingTalkEncryptException(900007);
     }
@@ -57,7 +62,7 @@ class DingTalkEncryptor {
       // decrypt
       const crypto = Crypto.createDecipheriv('AES-256-CBC', this.aesKey, this.iv);
       crypto.setAutoPadding(false);
-      decrypt = Buffer.concat([crypto.update(encrypted, 'base64')]);
+      decrypt = Buffer.concat([crypto.update(encrypted, 'base64'), crypto.final()]);
     } catch (e) {
       throw new DingTalkEncryptException(900008);
     }
@@ -94,7 +99,7 @@ class DingTalkEncryptor {
     const strArr = [ token, timestamp, nonce, encrypt ];
     strArr.sort();
     const sha1 = Crypto.createHash('sha1');
-    sha1.update(strArr.join(''))
+    sha1.update(strArr.join(''));
     return sha1.digest('hex');
   }
 

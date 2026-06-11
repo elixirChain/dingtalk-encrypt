@@ -1,9 +1,8 @@
 'use strict';
 
-class DingTalkEncryptException {
+class DingTalkEncryptException extends Error {
   constructor(code) {
-    // super();
-    this.msgMap = new Map([
+    const msgMap = new Map([
       [ 0, '成功' ],
       [ 900001, '加密明文文本非法' ],
       [ 900002, '加密时间戳参数非法' ],
@@ -16,8 +15,11 @@ class DingTalkEncryptException {
       [ 900009, '计算解密文字长度不匹配' ],
       [ 900010, '计算解密文字corpid不匹配' ],
     ]);
+    const message = msgMap.get(code);
+    super(`DingTalkEncryptException: [${code}], ${message}`);
+    this.name = 'DingTalkEncryptException';
     this.code = code;
-    this.message = this.msgMap.get(code);
+    this.message = message;
   }
 
   toString(){

@@ -19,6 +19,9 @@ const encryptor = new DingTalkEncryptor(TOKEN, ENCODING_AES_KEY, CORP_ID);
 const ENCRYPT_RANDOM_16 = utils.getRandomStr(16);
 const timeStamp = (new Date().getTime()).toString();
 const nonce = utils.getRandomStr(8);
+console.log(`- ENCRYPT_RANDOM_16: ${ENCRYPT_RANDOM_16}`);
+console.log(`- timeStamp: ${timeStamp}`);
+console.log(`- nonce: ${nonce}`);
 
 /** 测试加解密响应报文或者字符串 */
 const testJson = {
@@ -36,17 +39,17 @@ const testStr = '中文乱码测试/abc/123';
 // const unencryptedStr = 'success';
 
 const unencryptedStr = JSON.stringify(testStr);
-console.log(`  node unencryptedStr:\n ${unencryptedStr}, (${unencryptedStr.length})`);
+console.log(`- unencryptedStr:\n  ${unencryptedStr}, (${unencryptedStr.length})`);
 const encryptedStr = encryptor.encrypt(ENCRYPT_RANDOM_16, unencryptedStr);
-console.log(`  \nnode encryptedStr:\n ${encryptedStr}`);
+console.log(`\n- encryptedStr:\n  ${encryptedStr}`);
 const decryptedJson = encryptor.decrypt(encryptedStr);
-console.log(`  \nnode decryptedJson:\n ${decryptedJson}, (${decryptedJson.length}), ${unencryptedStr === decryptedJson}` );
-console.log('  \nnode sign:\n ' + encryptor.getSignature(TOKEN, timeStamp, nonce, encryptedStr));
+console.log(`\n- decryptedJson:\n  ${decryptedJson}, (${decryptedJson.length}), ${unencryptedStr === decryptedJson}` );
+console.log('\n- sign:\n ' + encryptor.getSignature(TOKEN, timeStamp, nonce, encryptedStr));
 
 console.log('\n# DingTalk test:');
 const plaintext = JSON.stringify(testJson);
 const encryptRes = encryptor.getEncryptedMap(plaintext, timeStamp, nonce);
-console.log('encrypt: ', encryptRes);
+console.log('- encrypt: ', encryptRes);
 const decryptRes = encryptor.getDecryptMsg(encryptRes.msg_signature, encryptRes.timeStamp, encryptRes.nonce, encryptRes.encrypt);
-console.log('decrypt: ', JSON.parse(decryptRes));
+console.log('- decrypt: ', JSON.parse(decryptRes));
 
